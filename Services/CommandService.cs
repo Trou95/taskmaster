@@ -6,22 +6,22 @@ public class CommandService
 {
     public CommandService()
     {
-        _commands = new Dictionary<Command, Container>();
+        _commands = new HashSet<Command>();
     }
 
-    public CommandService(Dictionary<Command, Container> commands) : this()
+    public CommandService(HashSet<Command> commands) : this()
     {
         _commands = commands;
     }
 
-    public void Add(Command command, Container container)
+    public void Add(Command command)
     {
         try
         {
             if(!Command.IsValidCommand(command))
                 throw new ArgumentException($"CommandService: Invalid Command ({command})");
 
-            _commands.Add(command, container);
+            _commands.Add(command);
         }
         catch (ArgumentException e)
         {
@@ -33,24 +33,19 @@ public class CommandService
         }
     }
 
-    public void Add(Tuple<Command, Container> command)
+    public static CommandService operator +(CommandService commandService, Command command)
     {
-        Add(command.Item1, command.Item2);
-    }
-
-    public static CommandService operator +(CommandService commandService, Tuple<Command, Container> command)
-    {
-        commandService.Add(command.Item1, command.Item2);
+        commandService.Add(command);
         return commandService;
     }
 
 
-    public IReadOnlyDictionary<Command, Container> GetCommands() 
+    public IReadOnlySet<Command> GetCommands()
     {
         return _commands;
     }
 
-    private Dictionary<Command, Container> _commands;
+    private HashSet<Command> _commands;
     public int Count { get => _commands.Count; }
 
 }

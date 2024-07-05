@@ -13,11 +13,11 @@ static void ApplicationStart()
     var containers = config.Read();
     foreach (var container in containers)
     {
-        commandService.Add(container.Command, container);
+        commandService.Add(container.Command);
     }
 
     Console.WriteLine(commandService.Count);
-    commandService.GetCommands().ToList().ForEach(x => Console.WriteLine(x.Key));
+    commandService.GetCommands().ToList().ForEach(x => Console.WriteLine(x.cmd));
   
 }
 
