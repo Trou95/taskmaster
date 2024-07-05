@@ -1,0 +1,47 @@
+﻿
+using System.Diagnostics;
+using System.Text.Json.Serialization;
+using Taskmaster.Enums;
+
+
+namespace Taskmaster.Modals;
+
+public class Container
+{
+    required public string Name { get; set; }
+    required public string Command { get; set; }
+    public int NumberOfProcesses { get; set; }
+    public bool StartAtLaunch { get; set; }
+    public RestartPolicy RestartPolicy { get; set; }
+    public List<int> ExpectedExitCodes { get; set; }
+    public int ExpectedExitCode { get; set; }
+    public uint StartTimeout { get; set; }
+    public int MaxRestartAttempts { get; set; }
+    public int StopSignal { get; set; }
+    public uint KillTimeout { get; set; }
+    public bool LogOutput { get; set; }
+    public Dictionary<string, string> EnvironmentVariables { get; set; }
+    public string WorkingDirectory { get; set; }
+    public int Umask { get; set; }
+
+    [JsonIgnore]
+    public Process? process { get; set; }
+
+    public Container()
+    {
+        ExpectedExitCodes = new List<int>();
+        EnvironmentVariables = new Dictionary<string, string>();
+
+        NumberOfProcesses = 1;
+        StartAtLaunch = false;
+        RestartPolicy = RestartPolicy.Never;
+        ExpectedExitCode = 0;
+        StartTimeout = 1000 * 5;
+        MaxRestartAttempts = 3;
+        StopSignal = 15;
+        KillTimeout = 1000 * 5;
+        LogOutput = false;
+        WorkingDirectory = "";
+        Umask = 0;
+    }
+}
