@@ -6,28 +6,38 @@ using Taskmaster.Services;
 
 static void ApplicationStart()
 {
-    Config config = new Config("task.config.json");
-    CommandService commandService = new CommandService();
+    App app = new App();
+
+    app.inputService.OnCommandTyped += OnCommandTyped;
 
     #region Init Default Cmds
     {
-        commandService += "/status";
-        commandService += "/start";
-        commandService += "/stop";
-        commandService += "/restart";
-        commandService += "/reloadconfig";
+        app.commandService += "/status";
+        app.commandService += "/start";
+        app.commandService += "/stop";
+        app.commandService += "/restart";
+        app.commandService += "/reloadconfig";
     }
     #endregion
 
     #region Read Config
-    var containers = config.Read();
+    var containers = app.config.Read();
     foreach (var container in containers)
     {
-        commandService.Add(container.Command);
+        app.commandService.Add(container.Command);
     }
     #endregion
 
+    while(true)
+    {
+       app.inputService.GetInput("> ");
+    }
   
 }
 
 ApplicationStart();
+
+static void OnCommandTyped(IApp app, string command)
+{ 
+    Console.WriteLine($"Command: {command}");
+}

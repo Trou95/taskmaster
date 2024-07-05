@@ -8,6 +8,9 @@ public readonly record struct Command(string cmd)
 
     public static bool IsValidCommand(string cmd)
     {
+        if(cmd == null)
+            return false;
+
         if(cmd.Length < 2)
             return false;
 
