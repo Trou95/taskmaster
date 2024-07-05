@@ -21,7 +21,9 @@ public class CommandService
             if(!Command.IsValidCommand(command))
                 throw new ArgumentException($"CommandService: Invalid Command ({command})");
 
-            _commands.Add(command);
+            if (!_commands.Add(command))
+                throw new ArgumentException($"CommandService: Command ({command}) is already exist");
+   
         }
         catch (ArgumentException e)
         {
@@ -31,6 +33,11 @@ public class CommandService
         {
             
         }
+    }
+
+    public bool IsCommandExist(Command command)
+    {
+        return _commands.Contains(command);
     }
 
     public static CommandService operator +(CommandService commandService, Command command)

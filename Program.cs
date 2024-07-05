@@ -7,7 +7,6 @@ using Taskmaster.Services;
 static void ApplicationStart()
 {
     App app = new App();
-
     app.inputService.OnCommandTyped += OnCommandTyped;
 
     #region Init Default Cmds
@@ -39,5 +38,13 @@ ApplicationStart();
 
 static void OnCommandTyped(IApp app, string command)
 { 
-    Console.WriteLine($"Command: {command}");
+    //Console.WriteLine($"Command: {command}");
+    if(app.commandService.IsCommandExist(command))
+    {
+        Console.WriteLine($"Command: {command} is exist");
+    }
+    else
+    {
+        Console.WriteLine($"Command: {command} is not exist");
+    }
 }
