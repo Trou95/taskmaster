@@ -44,4 +44,22 @@ public class Container
         WorkingDirectory = "";
         Umask = 0;
     }
+
+
+    /// <summary>
+    /// Prints some information about the container.
+    /// </summary>
+    /// <returns>
+    /// Container Name and Command as a string.
+    /// </returns>
+
+    public string Print()
+    {
+        return $"Name: {Name} - Command: {Command}";
+    }
+
+    public override string ToString()
+    {
+       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, ExpectedExitCode: {ExpectedExitCode}, StartTimeout: {StartTimeout}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout}, LogOutput: {LogOutput}, EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
+    }
 }
