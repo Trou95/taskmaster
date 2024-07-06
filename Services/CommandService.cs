@@ -29,7 +29,7 @@ public class CommandService
         {
             Console.WriteLine(e.Message);
         }
-        catch (Exception e)
+        catch 
         {
             
         }

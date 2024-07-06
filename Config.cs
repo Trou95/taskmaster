@@ -16,6 +16,9 @@ public class Config
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
+
+        if (!isExists())
+            Write(new List<Container>());
     }
 
     public List<Container>? Read()
@@ -23,14 +26,14 @@ public class Config
         try
         {
             if (!isExists())
-                File.Create(_configPath);
+                File.Create(_configPath).Close();
 
             var result = File.ReadAllText(_configPath);
             return JsonSerializer.Deserialize<List<Container>>(result, _options);
         }
-        catch (Exception e)
+        catch 
         {
-            Console.WriteLine(e.Message);
+
         }
         return null;
     }
@@ -40,14 +43,14 @@ public class Config
         try
         {
             if (!isExists())
-                File.Create(_configPath);
+                File.Create(_configPath).Close();
 
             var result = JsonSerializer.Serialize(containers, _options);
             File.WriteAllText(_configPath, result);
         }
-        catch (Exception e)
+        catch
         {
-            Console.WriteLine(e.Message);
+
         }
     }
 

@@ -24,9 +24,6 @@ public class Container
     public string WorkingDirectory { get; set; }
     public int Umask { get; set; }
 
-    [JsonIgnore]
-    public Process? process { get; set; }
-
     public Container()
     {
         ExpectedExitCodes = new List<int>();
