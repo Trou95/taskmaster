@@ -38,8 +38,9 @@ public class ContainerService
         return _containers.Find(c => c.Command == command);
     }
 
-    private List<ExtendedContainer> _containers { get; set; }
+    public int Count { get => _containers.Count; }
 
+    private List<ExtendedContainer> _containers { get; set; }
     private readonly IMapper _mapper;
 
     private class ExtendedContainer : Container

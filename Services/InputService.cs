@@ -15,8 +15,8 @@ public class InputService
         Console.Write(prefix);
         _input = Console.ReadLine();
 
-        if(Command.IsValidCommand(_input))
-            OnCommandTyped?.Invoke(app, _input);
+        if(Command.IsValidCommand(_input!))
+            OnCommandTyped?.Invoke(app, _input!);
             
 
         return _input;

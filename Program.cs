@@ -6,19 +6,21 @@ using Taskmaster.Services;
 
 static void ApplicationStart()
 {
-    App app = null;
-    //app.inputService.OnCommandTyped += OnCommandTyped;
+    App? app = null;
 
     try
     {
-        Console.WriteLine("asdad");
         app = new App();
 
         var containers = app.config.Read();
-        foreach (var container in containers)
+ 
+        if(containers != null)
         {
-            app.commandService.Add(container.Command);
-        }
+            foreach (var container in containers)
+                app.commandService.Add(container.Command);
+        } 
+
+        app.inputService.OnCommandTyped += OnCommandTyped;
     }
     catch (Exception e)
     {

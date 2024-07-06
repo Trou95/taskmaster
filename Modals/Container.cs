@@ -8,8 +8,9 @@ namespace Taskmaster.Modals;
 
 public class Container
 {
-    required public string Name { get; set; }
-    required public string Command { get; set; }
+    public required string Name { get; set; }
+    public required string Command { get; set; }
+    public required string binaryPath { get; set; }
     public int NumberOfProcesses { get; set; }
     public bool StartAtLaunch { get; set; }
     public RestartPolicy RestartPolicy { get; set; }

@@ -28,14 +28,14 @@ public class Config
             if (!isExists())
                 File.Create(_configPath).Close();
 
-            var result = File.ReadAllText(_configPath);
-            return JsonSerializer.Deserialize<List<Container>>(result, _options);
+            var content = File.ReadAllText(_configPath);
+            var res = JsonSerializer.Deserialize<List<Container>>(content, _options);
+            return res;
         }
-        catch 
+        catch (Exception e)
         {
-
+            throw new Exception(e.Message);
         }
-        return null;
     }
 
     public void Write(List<Container> containers)
