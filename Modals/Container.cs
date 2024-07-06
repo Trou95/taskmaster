@@ -10,7 +10,8 @@ public class Container
 {
     public required string Name { get; set; }
     public required string Command { get; set; }
-    public required string binaryPath { get; set; }
+    public required string BinaryPath { get; set; }
+    public bool ContainerStatus { get; set; }
     public int NumberOfProcesses { get; set; }
     public bool StartAtLaunch { get; set; }
     public RestartPolicy RestartPolicy { get; set; }
@@ -30,6 +31,7 @@ public class Container
         ExpectedExitCodes = new List<int>();
         EnvironmentVariables = new Dictionary<string, string>();
 
+        ContainerStatus = false;
         NumberOfProcesses = 1;
         StartAtLaunch = false;
         RestartPolicy = RestartPolicy.Never;

@@ -12,12 +12,15 @@ static void ApplicationStart()
     {
         app = new App();
 
-        var containers = app.config.Read();
+        var res = app.config.Read();
  
-        if(containers != null)
+        if(res != null)
         {
-            foreach (var container in containers)
-                app.commandService.Add(container.Command);
+            foreach (var c in res)
+            {
+                app.commandService.Add(c.Command);
+                app.containerService.Add(c);
+            }
         } 
 
         app.inputService.OnCommandTyped += OnCommandTyped;
@@ -42,7 +45,7 @@ static void OnCommandTyped(IApp app, string command)
     //Console.WriteLine($"Command: {command}");
     if(app.commandService.IsCommandExist(command))
     {
-        Console.WriteLine($"Command: {command} is exist");
+        app.containerService.StartContainer(command);
     }
     else
     {

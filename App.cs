@@ -9,6 +9,8 @@ public interface IApp
      public Config config { get; }
      public CommandService commandService { get; }
      public InputService inputService { get; }
+
+     public ContainerService containerService { get; }
 }
 
 public class App : IApp
@@ -56,7 +58,7 @@ public class App : IApp
         {
             Name = "Test",
             Command = "/test",
-            binaryPath = "/bin/ls",
+            BinaryPath = "/bin/ls",
             NumberOfProcesses = 1,
             StartAtLaunch = false,
             RestartPolicy = RestartPolicy.Never,
