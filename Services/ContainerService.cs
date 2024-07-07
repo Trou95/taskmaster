@@ -42,7 +42,7 @@ public class ContainerService
                 container.ContainerStatus = true;
                 foreach (var process in container.processes)
                 { 
-                    Task.Run(() => ProcessHandler(process));
+                    process.Value.Start();
                 }
                 
             }
@@ -67,26 +67,19 @@ public class ContainerService
     private void ProcessHandler(Process process)
     {
         var p = process.Start();
+        Console.WriteLine("ProcessHander Start:  " + p);
         if (!p)
         {
             if (process.HasExited)
                 Console.WriteLine($"ProcessHandler: Process Exited{process.ExitCode}");
         }
 
-        var container = _containers.Find(c => c.processes.Contains(process));
+        var container = _containers.Find(c => c.processes.ContainsKey(process));
         if (container == null)
             return;
-
-        StreamReader reader = process.StandardOutput;
-        container.StdOut += reader.ReadToEndAsync().Result;
-        //Console.WriteLine("ProcessHandler:  " + container.StdOut);
-
-        process.WaitForExit();
-        container.TaskStatus.Remove(process);
-
     }
 
-    private List<Process> InitProcess(ExtendedContainer container)
+    private Dictionary<Process, Task> InitProcess(ExtendedContainer container)
     {      
 
         for(int i = 0; i < container.NumberOfProcesses; i++)
@@ -94,12 +87,10 @@ public class ContainerService
             var process = new Process();
             process.StartInfo.FileName = container.BinaryPath;
             process.EnableRaisingEvents = true;
-            process.Exited += (sender, e) => OnProcessExit((Process?)sender, e);
+            process.Exited += (sender, e) => ProcessExitHandler((Process?)sender, e);
             process.StartInfo.RedirectStandardOutput = true;
 
-
-            container.TaskStatus.Add(process, false);
-            container.processes.Add(process);
+            container.processes.Add(process, new Task(() => ProcessHandler(process)));
 
         }
         return container.processes;
@@ -113,9 +104,9 @@ public class ContainerService
 
     private class ExtendedContainer : Container
     {
-        public List<Process> processes { get; set; } = new List<Process>();
+        //public List<Process> processes { get; set; } = new List<Process>();
 
-        public Dictionary<Process, bool> TaskStatus { get; set; } = new Dictionary<Process, bool>();
+        public Dictionary<Process, Task> processes { get; set; } = new Dictionary<Process, Task>();
 
         public string StdOut { get; set; } = "";
         public string StdErr { get; set; } = "";
@@ -123,33 +114,36 @@ public class ContainerService
     }
 
     /* Events */
-    private void OnProcessExit(Process? process, EventArgs e)
+    private void ProcessExitHandler(Process? process, EventArgs e)
     {
+        Console.WriteLine("OnProcessExit");
 
         if (process == null)
             return;
 
-        var container = _containers.Find(c => c.processes.Contains(process));
+        var container = _containers.Find(c => c.processes.ContainsKey(process));
         if (container == null)
             return;
 
-        Console.WriteLine($"Process Exit: {container.Name} - {process.ExitCode}");
 
-        while(container.TaskStatus.ContainsKey(process))
-        {
-            Thread.Sleep(1000);
-        }
+        StreamReader reader = process.StandardOutput;
+        container.StdOut += reader.ReadToEnd();
+        Console.WriteLine("OnProcessOut: " + container.StdOut);
 
+        process.WaitForExit();
+        Console.WriteLine($"OnProcessExit2 : {container.Name} - {process.ExitCode}");
+        
+        //container.processes[process].Dispose();
         container.processes.Remove(process);
         if(container.processes.Count == 0)
         {
             container.ContainerStatus = false;
 
             //OnContainerStop(container);
-            
+        
             try
             {
-                File.WriteAllTextAsync($"{container.Name}.log", container.StdOut);
+                File.WriteAllText($"./{container.Name}.log", container.StdOut);
             }
             catch
             {
