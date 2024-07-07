@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using AutoMapper;
 using Taskmaster.Modals;
@@ -116,8 +117,7 @@ public class ContainerService
     /* Events */
     private void ProcessExitHandler(Process? process, EventArgs e)
     {
-        Console.WriteLine("OnProcessExit");
-
+ 
         if (process == null)
             return;
 
@@ -128,17 +128,17 @@ public class ContainerService
 
         StreamReader reader = process.StandardOutput;
         container.StdOut += reader.ReadToEnd();
-        Console.WriteLine("OnProcessOut: " + container.StdOut);
 
         process.WaitForExit();
-        Console.WriteLine($"OnProcessExit2 : {container.Name} - {process.ExitCode}");
-        
-        //container.processes[process].Dispose();
+        Console.WriteLine($" --- Process: {process.Id} Exited ---");
+        Console.WriteLine($"StdOut: {container.StdOut}");
+        Console.WriteLine(" --- Process: Exited ---");
+
         container.processes.Remove(process);
         if(container.processes.Count == 0)
         {
             container.ContainerStatus = false;
-
+          
             //OnContainerStop(container);
         
             try
@@ -149,7 +149,11 @@ public class ContainerService
             {
 
             }
-            Console.WriteLine($"Container: {container.Name} is stopped");
+            finally
+            {
+                container.StdOut = "";
+                Console.WriteLine($"Container:  {container.Name} is stopped");
+            }
         }
   
     }
