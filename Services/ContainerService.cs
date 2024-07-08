@@ -1,7 +1,9 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using AutoMapper;
+using Taskmaster.Enums;
 using Taskmaster.Modals;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -12,8 +14,9 @@ public class ContainerService
     public ContainerService() 
     {
         _containers = new List<ExtendedContainer>();
-        _mapper = new MapperConfiguration(cfg => { 
-            cfg.CreateMap<Container, ExtendedContainer>(); 
+        _mapper = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Container, ExtendedContainer>();
         }).CreateMapper();
     }
 
@@ -32,20 +35,19 @@ public class ContainerService
                 if (res.NumberOfProcesses < 1)
                     return;
 
-                if (res.ContainerStatus)
+                if (res.ContainerStatus != ContainerStatus.Waiting)
                     throw new ContainerServiceException($"Error: {res.Name} is already running");
 
                 ExtendedContainer container = (ExtendedContainer)res;
-                container.processes = InitProcess(container); 
+                container.Processes = InitProcess(container);
                 
                 Console.WriteLine($"Starting Container: {container.Name} - {container.BinaryPath} ProcessCount: {container.NumberOfProcesses}");
 
-                container.ContainerStatus = true;
-                foreach (var process in container.processes)
+                container.ContainerStatus = ContainerStatus.Running;
+                foreach (var process in container.Processes)
                 { 
                     process.Value.Start();
-                }
-                
+                }            
             }
         }
         catch (ContainerServiceException e)
@@ -53,6 +55,55 @@ public class ContainerService
             Console.WriteLine(e.Message);
         }
 
+    }
+
+    public void StopContainer(Container container)
+    {
+        if (container.ContainerStatus == ContainerStatus.Waiting)
+            return;
+ 
+        var c = (ExtendedContainer)container;
+
+        //OnContainerStop(container);
+        try
+        {
+            File.WriteAllText($"./{container.Name}.log", c.StdOut);
+        }
+        catch
+        {
+
+        }
+        finally
+        {
+            c.StdOut = "";
+            c.TotalProcessRetryCount = 0;
+            c.ContainerStatus = ContainerStatus.Waiting;
+            Console.WriteLine($"Container: {container.Name} is stopped");
+        }
+    }
+
+    public void RestartContainer(Process process)
+    {
+        var container = _containers.Find(c => c.Processes.ContainsKey(process));
+        if (container == null)
+            return;
+
+        if (container.TotalProcessRetryCount < container.MaxRestartAttempts)
+        {
+            Console.WriteLine($"Process Restarting");
+            container.ContainerStatus = ContainerStatus.Restarting;
+            container.CancellationTokenSource.Cancel();
+            Task.Delay(1000).Wait();
+            container.TotalProcessRetryCount++;
+            container.CancellationTokenSource = new CancellationTokenSource();
+            container.ProcessStartTimes.Remove(process);
+            container.Processes[process] = new Task(() => ProcessHandler(process), container.CancellationTokenSource.Token);
+            container.Processes[process].Start();
+        }
+        else
+        {
+            StopContainer(container);
+        }
     }
 
     public void Add(Container container)
@@ -67,17 +118,23 @@ public class ContainerService
 
     private void ProcessHandler(Process process)
     {
-        var p = process.Start();
-        Console.WriteLine("ProcessHander Start:  " + p);
-        if (!p)
+ 
+        bool p;
+        try
         {
-            if (process.HasExited)
-                Console.WriteLine($"ProcessHandler: Process Exited{process.ExitCode}");
+            p = process.Start();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            ProcessLaunchErrorHandler(process, e.Message);
+            return;
         }
 
-        var container = _containers.Find(c => c.processes.ContainsKey(process));
+        var container = _containers.Find(c => c.Processes.ContainsKey(process));
         if (container == null)
             return;
+        container.ProcessStartTimes[process] = DateTime.Now;
     }
 
     private Dictionary<Process, Task> InitProcess(ExtendedContainer container)
@@ -91,10 +148,10 @@ public class ContainerService
             process.Exited += (sender, e) => ProcessExitHandler((Process?)sender, e);
             process.StartInfo.RedirectStandardOutput = true;
 
-            container.processes.Add(process, new Task(() => ProcessHandler(process)));
+            container.Processes.Add(process, new Task(() => ProcessHandler(process), container.CancellationTokenSource.Token));
 
         }
-        return container.processes;
+        return container.Processes;
     }
 
 
@@ -105,12 +162,13 @@ public class ContainerService
 
     private class ExtendedContainer : Container
     {
-        //public List<Process> processes { get; set; } = new List<Process>();
-
-        public Dictionary<Process, Task> processes { get; set; } = new Dictionary<Process, Task>();
-
+        public Dictionary<Process, Task> Processes { get; set; } = new Dictionary<Process, Task>();
+        public CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
+        public CancellationToken CancellationToken { get; set; }
+        public Dictionary<Process, DateTime> ProcessStartTimes { get; set; } = new Dictionary<Process, DateTime>();
         public string StdOut { get; set; } = "";
         public string StdErr { get; set; } = "";
+        public int TotalProcessRetryCount { get; set; } = 0;
 
     }
 
@@ -121,41 +179,82 @@ public class ContainerService
         if (process == null)
             return;
 
-        var container = _containers.Find(c => c.processes.ContainsKey(process));
+        var container = _containers.Find(c => c.Processes.ContainsKey(process));
         if (container == null)
             return;
 
 
         StreamReader reader = process.StandardOutput;
         container.StdOut += reader.ReadToEnd();
+  
 
         process.WaitForExit();
-        Console.WriteLine($" --- Process: {process.Id} Exited ---");
-        Console.WriteLine($"StdOut: {container.StdOut}");
-        Console.WriteLine(" --- Process: Exited ---");
 
-        container.processes.Remove(process);
-        if(container.processes.Count == 0)
+        var processTotalRunTime = (process.ExitTime - container.ProcessStartTimes[process]).TotalSeconds;
+
+        if(processTotalRunTime > container.ExpectedRunTime)
         {
-            container.ContainerStatus = false;
-          
-            //OnContainerStop(container);
-        
-            try
-            {
-                File.WriteAllText($"./{container.Name}.log", container.StdOut);
-            }
-            catch
-            {
+            Console.WriteLine($"Process: {process.Id} Succesfully executed. Exceeded Expected Run Time: {processTotalRunTime}");
+        }
 
-            }
-            finally
+        if(container.RestartPolicy != RestartPolicy.Never)
+        {
+            if(container.RestartPolicy == RestartPolicy.Always)
             {
-                container.StdOut = "";
-                Console.WriteLine($"Container:  {container.Name} is stopped");
+                RestartContainer(process);
+                return;
+            }
+            if(container.RestartPolicy == RestartPolicy.OnFailure)
+            {
+                if(!container.ExpectedExitCodes.Contains(process.ExitCode))
+                {
+                    RestartContainer(process);
+                    return;
+                }                
             }
         }
+
+
+        //Console.WriteLine($" --- Process: {process.Id} Exited ---");
+        //Console.WriteLine($"StdOut: {container.StdOut}");
+        //Console.WriteLine(" --- Process: Exited ---");
+
+        container.Processes.Remove(process);
+        container.ProcessStartTimes.Remove(process);
+        if(container.Processes.Count == 0)
+        {
+           StopContainer(container);
+        }
   
+    }
+
+    private void ProcessLaunchErrorHandler(Process process, string message)
+    {
+       var container = _containers.Find(c => c.Processes.ContainsKey(process));
+       if(container == null)
+            return;
+
+
+       RestartContainer(process);
+
+       /*
+       if(container.TotalProcessRetryCount < container.MaxRestartAttempts)
+        {
+            Console.WriteLine($"Process Restarting");
+            container.CancellationTokenSource.Cancel();
+            Task.Delay(1000).Wait();
+            Console.WriteLine("asdsa");
+            container.TotalProcessRetryCount++;
+            container.CancellationTokenSource = new CancellationTokenSource();
+            Console.WriteLine("asdsa");
+            container.Processes[process] = new Task(() => ProcessHandler(process), container.CancellationTokenSource.Token);
+            container.Processes[process].Start();
+        }
+        else
+        {
+            StopContainer(container);
+        }
+       */
     }
 
     /* Exceptions */

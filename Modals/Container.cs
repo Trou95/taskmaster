@@ -11,13 +11,13 @@ public class Container
     public required string Name { get; set; }
     public required string Command { get; set; }
     public required string BinaryPath { get; set; }
-    public bool ContainerStatus { get; set; }
+    public ContainerStatus ContainerStatus { get; set; }
     public int NumberOfProcesses { get; set; }
     public bool StartAtLaunch { get; set; }
     public RestartPolicy RestartPolicy { get; set; }
     public List<int> ExpectedExitCodes { get; set; }
     public int ExpectedExitCode { get; set; }
-    public uint StartTimeout { get; set; }
+    public uint ExpectedRunTime { get; set; }
     public int MaxRestartAttempts { get; set; }
     public int StopSignal { get; set; }
     public uint KillTimeout { get; set; }
@@ -31,12 +31,12 @@ public class Container
         ExpectedExitCodes = new List<int>();
         EnvironmentVariables = new Dictionary<string, string>();
 
-        ContainerStatus = false;
+        ContainerStatus = ContainerStatus.Waiting;
         NumberOfProcesses = 1;
         StartAtLaunch = false;
         RestartPolicy = RestartPolicy.Never;
         ExpectedExitCode = 0;
-        StartTimeout = 1000 * 5;
+        ExpectedRunTime = 0;
         MaxRestartAttempts = 3;
         StopSignal = 15;
         KillTimeout = 1000 * 5;
@@ -59,6 +59,6 @@ public class Container
 
     public override string ToString()
     {
-       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, ExpectedExitCode: {ExpectedExitCode}, StartTimeout: {StartTimeout}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout}, LogOutput: {LogOutput}, EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
+       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, ExpectedExitCode: {ExpectedExitCode}, StartTimeout: {ExpectedRunTime}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout}, LogOutput: {LogOutput}, EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
     }
 }

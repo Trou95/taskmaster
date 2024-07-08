@@ -64,7 +64,7 @@ public class App : IApp
             RestartPolicy = RestartPolicy.Never,
             ExpectedExitCodes = new List<int> { 0 },
             ExpectedExitCode = 0,
-            StartTimeout = 1000 * 5,
+            ExpectedRunTime = 0,
             MaxRestartAttempts = 3,
             StopSignal = 15,
             KillTimeout = 1000 * 5,

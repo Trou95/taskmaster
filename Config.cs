@@ -1,5 +1,7 @@
-﻿using System.Text.Encodings.Web;
+﻿using System;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using Taskmaster.Enums;
 using Taskmaster.Modals;
 
 namespace Taskmaster;
@@ -14,7 +16,11 @@ public class Config
             WriteIndented = true,
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters =
+            {
+                new RestartPolicyConverter()
+            }
         };
 
         if (!isExists())
