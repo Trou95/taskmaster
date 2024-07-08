@@ -22,9 +22,11 @@ public class Container
     public int StopSignal { get; set; }
     public uint KillTimeout { get; set; }
     public bool LogOutput { get; set; }
+    public string StdOutPath { get; set; }
+    public string StdErrPath { get; set; }
     public Dictionary<string, string> EnvironmentVariables { get; set; }
     public string WorkingDirectory { get; set; }
-    public int Umask { get; set; }
+    public string? Umask { get; set; }
 
     public Container()
     {
@@ -41,8 +43,10 @@ public class Container
         StopSignal = 15;
         KillTimeout = 1000 * 5;
         LogOutput = false;
+        StdOutPath = "";
+        StdErrPath = "";
         WorkingDirectory = "";
-        Umask = 0;
+        Umask = null;
     }
 
 
@@ -59,6 +63,6 @@ public class Container
 
     public override string ToString()
     {
-       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, ExpectedExitCode: {ExpectedExitCode}, StartTimeout: {ExpectedRunTime}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout}, LogOutput: {LogOutput}, EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
+       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, ExpectedExitCode: {ExpectedExitCode}, StartTimeout: {ExpectedRunTime}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout} EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
     }
 }

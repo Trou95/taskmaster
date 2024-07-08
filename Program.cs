@@ -3,6 +3,12 @@ using Taskmaster.Modals;
 using Taskmaster;
 using Taskmaster.Enums;
 using Taskmaster.Services;
+using System.Runtime.InteropServices;
+using Mono.Unix;
+using Mono.Unix.Native;
+using static Taskmaster.Services.ContainerService;
+using System.Diagnostics;
+
 
 static void ApplicationStart()
 {
@@ -24,6 +30,12 @@ static void ApplicationStart()
         } 
 
         app.inputService.OnCommandTyped += OnCommandTyped;
+        app.containerService.OnContainerStarting += OnContainerStarting;
+        app.containerService.OnContainerSuccessfullyStart += OnContainerSuccessfullyStart;
+        app.containerService.OnContainerStop += OnContainerStop;
+        app.containerService.OnProcessExit += OnProcessExit;
+        app.OnSignalRecievedEvent += OnSignalRecieved;
+
     }
     catch (Exception e)
     {
@@ -42,13 +54,37 @@ ApplicationStart();
 
 static void OnCommandTyped(IApp app, string command)
 { 
-    //Console.WriteLine($"Command: {command}");
     if(app.commandService.IsCommandExist(command))
     {
         app.containerService.StartContainer(command);
     }
     else
     {
-        Console.WriteLine($"Command: {command} is not exist");
+        //Console.WriteLine($"Command: {command} is not exist");
     }
+}
+
+static void OnContainerStarting(Container container)
+{
+    //Console.WriteLine($"Container: {container.Name} is starting");
+}
+
+static void OnContainerSuccessfullyStart(Container container, int RunTime)
+{
+    //Console.WriteLine($"Container: {container.Name} is successfully started");
+}
+
+static void OnContainerStop(Container container)
+{
+    //Console.WriteLine($"Container: {container.Name} is stopped");
+}
+
+static void OnProcessExit(Process process)
+{
+   //Console.WriteLine($"Process: {process.Id} is exited");
+}
+
+static void OnSignalRecieved(IApp app, Signum signal)
+{
+    //app.containerService.SignalHandler(signal);
 }
