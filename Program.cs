@@ -31,13 +31,13 @@ static void ApplicationStart()
             }
         } 
 
-        app.inputService.OnCommandTyped += OnCommandTyped;
-        app.containerService.OnContainerStarting += OnContainerStarting;
-        app.containerService.OnContainerSuccessfullyStart += OnContainerSuccessfullyStart;
-        app.containerService.OnContainerStop += OnContainerStop;
-        app.containerService.OnProcessExit += OnProcessExit;
-        app.containerService.OnContainerRestart += OnContainerRestart;
-        app.OnSignalRecievedEvent += OnSignalRecieved;
+        app.inputService.OnCommandTyped += Events.OnCommandTyped;
+        app.containerService.OnContainerStarting += Events.OnContainerStarting;
+        app.containerService.OnContainerSuccessfullyStart += Events.OnContainerSuccessfullyStart;
+        app.containerService.OnContainerStop += Events.OnContainerStop;
+        app.containerService.OnProcessExit += Events.OnProcessExit;
+        app.containerService.OnContainerRestart += Events.OnContainerRestart;
+        app.OnSignalRecievedEvent += Events.OnSignalRecieved;
 
     }
     catch (Exception e)
@@ -46,8 +46,8 @@ static void ApplicationStart()
         System.Environment.Exit(1);
     }
 
-
     LogService.Add(new FileLogger("taskmaster.log"));
+    LogService.Add(new DatabaseLogger());
     while (true)
     {
         app!.inputService.GetInput("> ");
@@ -56,46 +56,3 @@ static void ApplicationStart()
 }
 
 ApplicationStart();
-
-static void OnCommandTyped(IApp app, string command)
-{ 
-    if(app.commandService.IsCommandExist(command))
-    {
-        app.containerService.StartContainer(command);
-    }
-    else
-    {
-        //Console.WriteLine($"Command: {command} is not exist");
-    }
-}
-
-static void OnContainerStarting(Container container)
-{
-    LogService.Log($"Container: {container.Name} is starting");
-}
-
-static void OnContainerSuccessfullyStart(Container container, int RunTime)
-{
-   LogService.Log($"Container: {container.Name} is successfully started in {RunTime} ms");
-}
-
-static void OnContainerStop(Container container)
-{
-    LogService.Log($"Container: {container.Name} is stopped");
-}
-
-static void OnProcessExit(Process process)
-{
-   LogService.Log($"Process: {process.Id} is exited");
-}
-
-static void OnContainerRestart(Container container, Process process)
-{
-    LogService.Log($"Container: {container.Name} is restarting");
-}
-
-static void OnSignalRecieved(IApp app, Signum signal)
-{
-    app.containerService.SignalHandler(signal);
-    LogService.Log($"Signal: {signal} is recieved");
-}

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Test",
+    "command": "/test",
+    "binaryPath": "./test",
+    "numberOfProcesses": 2,
+    "startAtLaunch": false,
+    "restartPolicy": {},
+    "expectedExitCodes": [
+      0
+    ],
+    "expectedExitCode": 0,
+    "startTimeout": 5000,
+    "maxRestartAttempts": 3,
+    "stopSignal": 15,
+    "killTimeout": 5000,
+    "logOutput": false,
+    "environmentVariables": {},
+    "workingDirectory": "",
+    "umask": 0
+  },
+  {
+    "name": "Test",
+    "command": "/ls",
+    "binaryPath": "/bin/ls",
+    "numberOfProcesses": 2,
+    "startAtLaunch": false,
+    "restartPolicy": {},
+    "expectedExitCodes": [
+      0
+    ],
+    "expectedExitCode": 0,
+    "startTimeout": 5000,
+    "maxRestartAttempts": 3,
+    "stopSignal": 15,
+    "killTimeout": 5000,
+    "logOutput": false,
+    "environmentVariables": {},
+    "workingDirectory": "",
+    "umask": 0
+  }
+]
