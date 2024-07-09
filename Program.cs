@@ -8,6 +8,8 @@ using Mono.Unix;
 using Mono.Unix.Native;
 using static Taskmaster.Services.ContainerService;
 using System.Diagnostics;
+using Taskmaster.Logger;
+
 
 
 static void ApplicationStart()
@@ -34,6 +36,7 @@ static void ApplicationStart()
         app.containerService.OnContainerSuccessfullyStart += OnContainerSuccessfullyStart;
         app.containerService.OnContainerStop += OnContainerStop;
         app.containerService.OnProcessExit += OnProcessExit;
+        app.containerService.OnContainerRestart += OnContainerRestart;
         app.OnSignalRecievedEvent += OnSignalRecieved;
 
     }
@@ -43,6 +46,8 @@ static void ApplicationStart()
         System.Environment.Exit(1);
     }
 
+
+    LogService.Add(new FileLogger("taskmaster.log"));
     while (true)
     {
         app!.inputService.GetInput("> ");
@@ -66,25 +71,31 @@ static void OnCommandTyped(IApp app, string command)
 
 static void OnContainerStarting(Container container)
 {
-    //Console.WriteLine($"Container: {container.Name} is starting");
+    LogService.Log($"Container: {container.Name} is starting");
 }
 
 static void OnContainerSuccessfullyStart(Container container, int RunTime)
 {
-    //Console.WriteLine($"Container: {container.Name} is successfully started");
+   LogService.Log($"Container: {container.Name} is successfully started in {RunTime} ms");
 }
 
 static void OnContainerStop(Container container)
 {
-    //Console.WriteLine($"Container: {container.Name} is stopped");
+    LogService.Log($"Container: {container.Name} is stopped");
 }
 
 static void OnProcessExit(Process process)
 {
-   //Console.WriteLine($"Process: {process.Id} is exited");
+   LogService.Log($"Process: {process.Id} is exited");
+}
+
+static void OnContainerRestart(Container container, Process process)
+{
+    LogService.Log($"Container: {container.Name} is restarting");
 }
 
 static void OnSignalRecieved(IApp app, Signum signal)
 {
-    //app.containerService.SignalHandler(signal);
+    app.containerService.SignalHandler(signal);
+    LogService.Log($"Signal: {signal} is recieved");
 }

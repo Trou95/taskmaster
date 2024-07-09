@@ -85,6 +85,10 @@ public class ContainerService
         }
         finally
         {
+            Parallel.ForEach(c.Processes, process =>
+            {
+                process.Key.Kill();
+            });
             c.Processes.Clear();
             c.ProcessStartTimes.Clear();
             c.TotalProcessRetryCount = 0;
@@ -106,7 +110,7 @@ public class ContainerService
 
         if (container.TotalProcessRetryCount < container.MaxRestartAttempts)
         {
-            Console.WriteLine($"Process Restarting");
+            OnContainerRestart?.Invoke(container, process);
             container.ContainerStatus = ContainerStatus.Restarting;
             container.CancellationTokenSource.Cancel();
             Task.Delay(1000).Wait();
@@ -257,6 +261,9 @@ public class ContainerService
     public delegate void OnContainerSuccessfullyStartHandler(Container container, int RunTime);
     public event OnContainerSuccessfullyStartHandler? OnContainerSuccessfullyStart;
 
+    public delegate void OnContainerRestartHandler(Container container, Process process);
+    public event OnContainerRestartHandler? OnContainerRestart;
+
     private void ProcessExitHandler(Process? process, EventArgs e)
     {
  
@@ -280,7 +287,7 @@ public class ContainerService
         process.WaitForExit();
 
         var processTotalRunTime = (process.ExitTime - container.ProcessStartTimes[process]).TotalSeconds;
-        if(container.ExpectedRunTime == 0 || processTotalRunTime > container.ExpectedRunTime)
+        if(container.ExpectedRunTime != 0 && processTotalRunTime > container.ExpectedRunTime)
             OnContainerSuccessfullyStart?.Invoke(container, (int)processTotalRunTime);
         
         if(container.RestartPolicy != RestartPolicy.Never)

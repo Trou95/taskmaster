@@ -16,7 +16,6 @@ public class Container
     public bool StartAtLaunch { get; set; }
     public RestartPolicy RestartPolicy { get; set; }
     public List<int> ExpectedExitCodes { get; set; }
-    public int ExpectedExitCode { get; set; }
     public uint ExpectedRunTime { get; set; }
     public int MaxRestartAttempts { get; set; }
     public int StopSignal { get; set; }
@@ -37,7 +36,6 @@ public class Container
         NumberOfProcesses = 1;
         StartAtLaunch = false;
         RestartPolicy = RestartPolicy.Never;
-        ExpectedExitCode = 0;
         ExpectedRunTime = 0;
         MaxRestartAttempts = 3;
         StopSignal = 15;
@@ -63,6 +61,6 @@ public class Container
 
     public override string ToString()
     {
-       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, ExpectedExitCode: {ExpectedExitCode}, StartTimeout: {ExpectedRunTime}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout} EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
+       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, StartTimeout: {ExpectedRunTime}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout} EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
     }
 }

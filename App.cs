@@ -3,6 +3,10 @@ using Mono.Unix;
 using Taskmaster.Enums;
 using Taskmaster.Modals;
 using Taskmaster.Services;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System;
 
 namespace Taskmaster;
 
@@ -34,6 +38,7 @@ public class App : IApp
 
         InitDefaultCommands();
         SignalHandler();
+        SocketHandler();
 
         if(Environment.GetCommandLineArgs().Length > 1)
         {
@@ -69,7 +74,6 @@ public class App : IApp
                 StartAtLaunch = false,
                 RestartPolicy = RestartPolicy.Never,
                 ExpectedExitCodes = new List<int> { 0 },
-                ExpectedExitCode = 0,
                 ExpectedRunTime = 0,
                 MaxRestartAttempts = 3,
                 StopSignal = 15,
@@ -87,7 +91,7 @@ public class App : IApp
         List<UnixSignal> signals = new List<UnixSignal>();
         for(int i = 1; i < 32; i++)
         {
-            if(i == 9 || i == 19)
+            if(i == 9 || i == 17 || i == 19)
                 continue;
             signals.Add(new UnixSignal((Signum)i));
         }
@@ -108,6 +112,52 @@ public class App : IApp
             };
 
         });
+    }
+
+    private void SocketHandler()
+    {
+        IPAddress ipAddress = IPAddress.Any;
+        int port = 8080;
+
+        TcpListener listener = new TcpListener(ipAddress, port);
+        listener.Start();
+
+        Task.Run(() =>
+        {
+            while(true)
+            {
+                TcpClient client = listener.AcceptTcpClient();
+                NetworkStream stream = client.GetStream();
+
+                Task.Run(async () =>
+                {
+
+                    using (NetworkStream stream = client.GetStream())
+                    {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+
+
+                        while (true)
+                        {
+
+                            bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                            if (bytesRead == 0)
+                                break;
+
+                            string request = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                            if (commandService.IsCommandExist(request))
+                            {
+                                containerService.StartContainer(request);
+                            }
+                        }
+                    }
+                       
+                });
+               
+            }
+        });
+
     }
 
 
