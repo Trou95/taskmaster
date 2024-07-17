@@ -1,32 +1,22 @@
 ﻿
-using Taskmaster.Modals;
 using Taskmaster;
-using Taskmaster.Enums;
 using Taskmaster.Services;
-using System.Runtime.InteropServices;
-using Mono.Unix;
-using Mono.Unix.Native;
-using static Taskmaster.Services.ContainerService;
-using System.Diagnostics;
 using Taskmaster.Logger;
-
 
 
 static void ApplicationStart()
 {
     App? app = null;
-
     try
     {
         app = new App();
-
-        var res = app.config.Read();
+        var config = app.config.Read();
  
-        if(res != null)
+        if(config != null)
         {
-            foreach (var c in res)
+            foreach (var c in config)
             {
-                app.commandService.Add(c.Command);
+                app.commandService.Add(new (c.Command, false));
                 app.containerService.Add(c);
             }
         } 
@@ -35,10 +25,9 @@ static void ApplicationStart()
         app.containerService.OnContainerStarting += Events.OnContainerStarting;
         app.containerService.OnContainerSuccessfullyStart += Events.OnContainerSuccessfullyStart;
         app.containerService.OnContainerStop += Events.OnContainerStop;
-        app.containerService.OnProcessExit += Events.OnProcessExit;
         app.containerService.OnContainerRestart += Events.OnContainerRestart;
         app.OnSignalRecievedEvent += Events.OnSignalRecieved;
-
+ 
     }
     catch (Exception e)
     {
@@ -47,7 +36,7 @@ static void ApplicationStart()
     }
 
     LogService.Add(new FileLogger("taskmaster.log"));
-    LogService.Add(new DatabaseLogger());
+    //LogService.Add(new DatabaseLogger());
     while (true)
     {
         app!.inputService.GetInput("> ");

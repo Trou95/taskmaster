@@ -35,9 +35,21 @@ public class CommandService
         }
     }
 
+
+    public void RunCommand(Command command)
+    {
+        if(IsDefaultCommand(command))
+            OnDefaultCommand?.Invoke(command);
+    }
+
     public bool IsCommandExist(Command command)
     {
-        return _commands.Contains(command);
+        return _commands.Where(c => c.cmd == command.cmd).Count() > 0;
+    }
+
+    public bool IsDefaultCommand(Command command)
+    {
+        return _commands.Contains(command) && command.isDefault;
     }
 
     public static CommandService operator +(CommandService commandService, Command command)
@@ -45,6 +57,8 @@ public class CommandService
         commandService.Add(command);
         return commandService;
     }
+
+    public event Action<Command>? OnDefaultCommand;
 
 
     public IReadOnlySet<Command> GetCommands()

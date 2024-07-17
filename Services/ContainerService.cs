@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using AutoMapper;
 using Mono.Unix.Native;
 using Taskmaster.Enums;
 using Taskmaster.Modals;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Taskmaster.Services;
 
@@ -234,6 +231,14 @@ public class ContainerService
         }
     }
 
+    public void PrintContainers()
+    {
+        _containers.ForEach(c =>
+        {
+            Console.WriteLine($"{c} Status: {c.ContainerStatus}");
+        });
+    }
+
     private class ExtendedContainer : Container
     {
         public Dictionary<Process, Task> Processes { get; set; } = new Dictionary<Process, Task>();
@@ -251,9 +256,6 @@ public class ContainerService
 
     public delegate void OnContainerStopHandler(Container container);
     public event OnContainerStopHandler? OnContainerStop;
-
-    public delegate void OnProcessExitHandler(Process process);
-    public event OnProcessExitHandler? OnProcessExit;
 
     public delegate void OnContainerStartingHandler(Container container);
     public event OnContainerStartingHandler? OnContainerStarting;
@@ -286,7 +288,7 @@ public class ContainerService
         container.ProcessExitTime = DateTime.Now;
         process.WaitForExit();
 
-        var processTotalRunTime = (process.ExitTime - container.ProcessStartTimes[process]).TotalSeconds;
+        var processTotalRunTime = container.ProcessStartTimes.ContainsKey(process) ? (process.ExitTime - container.ProcessStartTimes[process]).TotalSeconds : 0;
         if(container.ExpectedRunTime != 0 && processTotalRunTime > container.ExpectedRunTime)
             OnContainerSuccessfullyStart?.Invoke(container, (int)processTotalRunTime);
         
@@ -306,8 +308,6 @@ public class ContainerService
                 }                
             }
         }
-
-        OnProcessExit?.Invoke(process);
 
         container.Processes.Remove(process);
         container.ProcessStartTimes.Remove(process);

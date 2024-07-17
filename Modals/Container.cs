@@ -47,20 +47,8 @@ public class Container
         Umask = null;
     }
 
-
-    /// <summary>
-    /// Prints some information about the container.
-    /// </summary>
-    /// <returns>
-    /// Container Name and Command as a string.
-    /// </returns>
-    public string Print()
-    {
-        return $"Name: {Name} - Command: {Command}";
-    }
-
     public override string ToString()
     {
-       return $"Name: {Name}, Command: {Command}, NumberOfProcesses: {NumberOfProcesses}, StartAtLaunch: {StartAtLaunch}, RestartPolicy: {RestartPolicy}, ExpectedExitCodes: {ExpectedExitCodes}, StartTimeout: {ExpectedRunTime}, MaxRestartAttempts: {MaxRestartAttempts}, StopSignal: {StopSignal}, KillTimeout: {KillTimeout} EnvironmentVariables: {EnvironmentVariables}, WorkingDirectory: {WorkingDirectory}, Umask: {Umask}";
+       return $"Name: {Name}, Command: {Command}";
     }
 }

@@ -11,11 +11,11 @@ public partial class Events
     {
         if (app.commandService.IsCommandExist(command))
         {
-            app.containerService.StartContainer(command);
-        }
-        else
-        {
-            //Console.WriteLine($"Command: {command} is not exist");
+         
+            if (app.commandService.IsDefaultCommand(command))
+                app.commandService.RunCommand(command);
+            else
+                app.containerService.StartContainer(command);
         }
     }
 
@@ -32,11 +32,6 @@ public partial class Events
     public static void OnContainerStop(Container container)
     {
         LogService.Log($"Container: {container.Name} is stopped");
-    }
-
-    public static void OnProcessExit(Process process)
-    {
-        LogService.Log($"Process: {process.Id} is exited");
     }
 
     public static void OnContainerRestart(Container container, Process process)

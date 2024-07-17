@@ -15,7 +15,6 @@ public interface IApp
      public Config config { get; }
      public CommandService commandService { get; }
      public InputService inputService { get; }
-
      public ContainerService containerService { get; }
 }
 
@@ -37,6 +36,8 @@ public class App : IApp
         inputService = new InputService(this);
 
         InitDefaultCommands();
+        commandService.OnDefaultCommand += OnDefaultCommand;
+
         SignalHandler();
         SocketHandler();
 
@@ -160,5 +161,11 @@ public class App : IApp
 
     }
 
-
+    private void OnDefaultCommand(Command command)
+    {
+        if(command == "/status")
+        {
+            containerService.PrintContainers();
+        }
+    }
 }

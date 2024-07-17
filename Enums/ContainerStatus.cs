@@ -38,7 +38,14 @@ public struct ContainerStatus
 
     public override string ToString()
     {
-        return status;
+        if (status == "Running")
+            return "\u001b[92mRunning\x1b[39m";
+        else if (status == "Waiting")
+            return "\u001b[93mWaiting\x1b[39m";
+        else if (status == "Restarting")
+            return "\u001b[91mRestarting\x1b[39m";
+        else
+            return "\u001b[91m-\x1b[39m";
     }
 
     private ContainerStatus(string status)

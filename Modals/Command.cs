@@ -1,7 +1,7 @@
 ﻿
 namespace Taskmaster.Modals;
 
-public readonly record struct Command(string cmd)
+public readonly record struct Command(string cmd, bool isDefault = true)
 {
     public static implicit operator string(Command command) => command.cmd;
     public static implicit operator Command(string cmd) => new Command(cmd);

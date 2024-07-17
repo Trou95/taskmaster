@@ -20,7 +20,7 @@ public static class LogService
     {
         foreach (var logger in _loggers)
         {
-            logger.Log(message);
+            logger.Log("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] " + message);
         }
     }
 }
