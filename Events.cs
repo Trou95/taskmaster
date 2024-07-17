@@ -18,6 +18,7 @@ public partial class Events
             }
             else
                 app.containerService.StartContainer(command);
+            ReadLine.AddHistory(command);
         }
     }
 

@@ -7,6 +7,7 @@ public class CommandService
     public CommandService()
     {
         _commands = new HashSet<Command>();
+        ReadLine.AutoCompletionHandler = new AutoCompletionHandler();
     }
 
     public CommandService(HashSet<Command> commands) : this()
@@ -22,7 +23,7 @@ public class CommandService
                 throw new ArgumentException($"CommandService: Invalid Command ({command})");
 
             if (!_commands.Add(command))
-                throw new ArgumentException($"CommandService: Command ({command}) is already exist");
+                throw new ArgumentException($"CommandService: Command ({command}) is already exist");     
    
         }
         catch (ArgumentException e)
@@ -84,5 +85,18 @@ public class CommandService
 
     private HashSet<Command> _commands;
     public int Count { get => _commands.Count; }
+
+    class AutoCompletionHandler : IAutoCompleteHandler
+    {
+        public char[] Separators { get; set; } = new char[] {  };
+    
+        public string[] GetSuggestions(string text, int index)
+        {
+            if (text.StartsWith("/"))
+                return new string[] { "/status", "/start", "/stop", "/restart" };
+            else
+                return ["/"];
+        }
+    }
 
 }

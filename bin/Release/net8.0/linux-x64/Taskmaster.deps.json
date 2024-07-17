@@ -13,6 +13,7 @@
           "Microsoft.NET.ILLink.Tasks": "8.0.6",
           "MongoDB.Driver": "2.27.0",
           "Mono.Posix": "7.1.0-final.1.21458.1",
+          "ReadLine": "2.0.1",
           "runtimepack.Microsoft.NETCore.App.Runtime.linux-x64": "8.0.6"
         },
         "runtime": {
@@ -909,6 +910,14 @@
           }
         }
       },
+      "ReadLine/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/ReadLine.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        }
+      },
       "SharpCompress/0.30.1": {
         "runtime": {
           "lib/net5.0/SharpCompress.dll": {
@@ -1074,6 +1083,13 @@
       "sha512": "sha512-Rhxz4A7By8Q0wEgDqR+mioDsYXGrcYMYPiWE9bSaUKMpG8yAGArhetEQV5Ms6KhKCLdQTlPYLBKPZYoKbAvT/g==",
       "path": "mono.unix/7.1.0-final.1.21458.1",
       "hashPath": "mono.unix.7.1.0-final.1.21458.1.nupkg.sha512"
+    },
+    "ReadLine/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-m3eptlV2hlZ3gWxdhvgsUpSjwyA3NCeLdbhgDt0V8rXP1E6ZbjOOExcAufHvAZepSKJvV+zZO1eYWGveShA4gw==",
+      "path": "readline/2.0.1",
+      "hashPath": "readline.2.0.1.nupkg.sha512"
     },
     "SharpCompress/0.30.1": {
       "type": "package",

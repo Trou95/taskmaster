@@ -12,10 +12,9 @@ public class InputService
 
     public string? GetInput(string prefix)
     {
-        Console.Write(prefix);
-        _input = Console.ReadLine();
+        _input = ReadLine.Read("> ");
 
-        if(Command.IsValidCommand(_input!))
+        if (Command.IsValidCommand(_input!))
             OnCommandTyped?.Invoke(app, _input!);
 
         return _input;
