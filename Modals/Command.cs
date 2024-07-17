@@ -17,9 +17,6 @@ public readonly record struct Command(string cmd, bool isDefault = true)
         if (cmd[0] != '/')
             return false;
 
-        if(cmd.IndexOf(' ') != -1)
-            return false;
-
         return true;
     }
 

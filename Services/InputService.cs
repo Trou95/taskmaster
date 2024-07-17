@@ -17,7 +17,6 @@ public class InputService
 
         if(Command.IsValidCommand(_input!))
             OnCommandTyped?.Invoke(app, _input!);
-            
 
         return _input;
     }

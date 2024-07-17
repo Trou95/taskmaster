@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using AutoMapper;
 using Mono.Unix.Native;
@@ -58,6 +60,20 @@ public class ContainerService
         catch (ContainerServiceException e)
         {
             Console.WriteLine(e.Message);
+        }
+    }
+
+    public void StartContainerByName(string name)
+    {
+        Container? res = _containers.Find(c => String.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (res != null)
+        {
+            Console.WriteLine($"Starting container {name}");
+            StartContainer(res.Command);
+        }
+        else
+        {
+            Console.WriteLine($"Error: Container {name} not found");
         }
     }
 

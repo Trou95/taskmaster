@@ -36,20 +36,37 @@ public class CommandService
     }
 
 
-    public void RunCommand(Command command)
+    public void RunCommand(string command, List<string> args)
     {
-        if(IsDefaultCommand(command))
-            OnDefaultCommand?.Invoke(command);
+        OnDefaultCommand?.Invoke(command, args);
     }
 
     public bool IsCommandExist(Command command)
     {
-        return _commands.Where(c => c.cmd == command.cmd).Count() > 0;
+        var cmd = CommandSplit(command.cmd);
+        return _commands.Where(c => CommandSplit(c.cmd) == cmd).Count() > 0;
     }
 
     public bool IsDefaultCommand(Command command)
     {
-        return _commands.Contains(command) && command.isDefault;
+        return IsCommandExist(command) && command.isDefault;
+    }
+
+    public string CommandSplit(string command)
+    {
+        if(command.Contains(" "))
+            return command.Split(" ")[0];
+        return command;
+    }
+
+    public Tuple<string, List<string>> ParseCommand(Command command)
+    {
+       if(command.cmd.Contains(" "))
+       {
+           var cmd = command.cmd.Split(" ");
+           return new Tuple<string, List<string>>(cmd[0], cmd.Skip(1).ToList());
+       }
+       return new Tuple<string, List<string>>(command.cmd, new List<string>());
     }
 
     public static CommandService operator +(CommandService commandService, Command command)
@@ -58,8 +75,7 @@ public class CommandService
         return commandService;
     }
 
-    public event Action<Command>? OnDefaultCommand;
-
+    public event Action<Command, List<string>>? OnDefaultCommand;
 
     public IReadOnlySet<Command> GetCommands()
     {

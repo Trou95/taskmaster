@@ -161,11 +161,21 @@ public class App : IApp
 
     }
 
-    private void OnDefaultCommand(Command command)
+    private void OnDefaultCommand(Command command, List<string> args)
     {
         if(command == "/status")
         {
             containerService.PrintContainers();
+        }
+        else if(command == "/start")
+        {
+            if(args.Count == 0)
+            {
+                Console.WriteLine("Error: Please provide a container name");
+                return;
+            }
+
+            containerService.StartContainerByName(args[0]);
         }
     }
 }

@@ -11,9 +11,11 @@ public partial class Events
     {
         if (app.commandService.IsCommandExist(command))
         {
-         
             if (app.commandService.IsDefaultCommand(command))
-                app.commandService.RunCommand(command);
+            {
+                var cmd = app.commandService.ParseCommand(command);
+                app.commandService.RunCommand(cmd.Item1, cmd.Item2);
+            }
             else
                 app.containerService.StartContainer(command);
         }
