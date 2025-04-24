@@ -6,24 +6,23 @@ using Taskmaster.Services;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System;
 
 namespace Taskmaster;
 
 public interface IApp
 {
      public Config config { get; }
-     public CommandService commandService { get; }
-     public InputService inputService { get; }
-     public ContainerService containerService { get; }
+     public CommandService commandService { get; set; }
+     public InputService inputService { get; set; }
+     public ContainerService containerService { get; set; }
 }
 
 public class App : IApp
 {
     public  Config config { get; }
-    public CommandService commandService { get; }
-    public InputService inputService { get; }
-    public ContainerService containerService { get; }
+    public CommandService commandService { get; set; }
+    public InputService inputService { get; set; }
+    public ContainerService containerService { get; set; }
 
     public delegate void OnSignalRecieved(IApp sender, Signum signal);
     public event OnSignalRecieved? OnSignalRecievedEvent;
@@ -31,11 +30,12 @@ public class App : IApp
     public App()
     {
         config = new Config("task.config.json");
-        commandService = new CommandService();
-        containerService = new ContainerService();
-        inputService = new InputService(this);
+        
+        this.AddAppServices().InitDefaultCommands();
 
-        InitDefaultCommands();
+        if(commandService == null || containerService == null || inputService == null)
+            throw new Exception("App is not initialized");
+
         commandService.OnDefaultCommand += OnDefaultCommand;
 
         SignalHandler();
@@ -51,15 +51,6 @@ public class App : IApp
                    InitDefaultContainer(this);
             }
         }
-    }
-
-    public void InitDefaultCommands()
-    {
-        commandService.Add("/status");
-        commandService.Add("/start");
-        commandService.Add("/stop");
-        commandService.Add("/restart");
-        commandService.Add("/reloadconfig");
     }
 
     private static void InitDefaultContainer(IApp app)
