@@ -18,6 +18,11 @@ static void ApplicationStart()
             {
                 app.commandService.Add(new (c.Command, false));
                 app.containerService.Add(c);
+                
+                if(c.StartAtLaunch)
+                {
+                    app.containerService.StartContainer(c.Command);
+                }
             }
         } 
 

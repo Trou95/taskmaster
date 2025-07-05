@@ -27,9 +27,9 @@ public class App : IApp
     public delegate void OnSignalRecieved(IApp sender, Signum signal);
     public event OnSignalRecieved? OnSignalRecievedEvent;
 
-    public App()
+    public App(string configPath = "task.config.json")
     {
-        config = new Config("task.config.json");
+        config = new Config(configPath);
         
         this.AddAppServices().InitDefaultCommands();
 
@@ -99,6 +99,10 @@ public class App : IApp
                 {
                     System.Environment.Exit(0);
                 }
+                else if (signals[index].Signum == Signum.SIGHUP)
+                {
+                    ReloadConfiguration();
+                }
 
                 OnSignalRecievedEvent?.Invoke(this, signals[index].Signum);
             };
@@ -167,6 +171,81 @@ public class App : IApp
             }
 
             containerService.StartContainerByName(args[0]);
+        }
+        else if(command == "/stop")
+        {
+            if(args.Count == 0)
+            {
+                Console.WriteLine("Error: Please provide a container name");
+                return;
+            }
+
+            containerService.StopContainerByName(args[0]);
+        }
+        else if(command == "/restart")
+        {
+            if(args.Count == 0)
+            {
+                Console.WriteLine("Error: Please provide a container name");
+                return;
+            }
+
+            containerService.RestartContainerByName(args[0]);
+        }
+        else if(command == "/reloadconfig")
+        {
+            ReloadConfiguration();
+        }
+        else if(command == "/quit")
+        {
+            Console.WriteLine("Shutting down Taskmaster...");
+            Environment.Exit(0);
+        }
+        else if(command == "/help")
+        {
+            PrintHelp();
+        }
+    }
+
+    private void PrintHelp()
+    {
+        Console.WriteLine("Available commands:");
+        Console.WriteLine("  /status           - Show status of all containers");
+        Console.WriteLine("  /start <name>     - Start a specific container");
+        Console.WriteLine("  /stop <name>      - Stop a specific container");
+        Console.WriteLine("  /restart <name>   - Restart a specific container");
+        Console.WriteLine("  /reloadconfig     - Reload configuration file");
+        Console.WriteLine("  /quit             - Exit Taskmaster");
+        Console.WriteLine("  /help             - Show this help message");
+        Console.WriteLine("");
+        Console.WriteLine("You can also send SIGHUP signal to reload configuration.");
+    }
+
+    private void ReloadConfiguration()
+    {
+        try
+        {
+            Console.WriteLine("Reloading configuration...");
+            LogService.Log("Configuration reload requested");
+            var newConfig = config.Reload();
+            
+            if(newConfig != null)
+            {
+                containerService.UpdateContainers(newConfig);
+                commandService.UpdateCommands(newConfig);
+                Console.WriteLine("Configuration reloaded successfully.");
+                LogService.Log("Configuration reloaded successfully");
+            }
+            else
+            {
+                Console.WriteLine("Warning: Configuration file is empty or invalid.");
+                LogService.Log("Configuration reload failed: file is empty or invalid");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error reloading configuration: {e.Message}");
+            LogService.Log($"Configuration reload failed: {e.Message}");
         }
     }
 }

@@ -65,6 +65,18 @@ public class Config
         return File.Exists(_configPath);
     }
 
+    public List<Container>? Reload()
+    {
+        try
+        {
+            return Read();
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Config reload failed: {e.Message}");
+        }
+    }
+
     private string _configPath { get; set; }
     private JsonSerializerOptions _options { get; set; }
 }

@@ -36,6 +36,21 @@ public class CommandService
         }
     }
 
+    public void UpdateCommands(List<Container> containers)
+    {
+        var existingCommands = _commands.Where(c => !c.isDefault).ToList();
+        
+        foreach (var cmd in existingCommands)
+        {
+            _commands.Remove(cmd);
+        }
+
+        foreach (var container in containers)
+        {
+            Add(new Command(container.Command, false));
+        }
+    }
+
 
     public void RunCommand(string command, List<string> args)
     {
@@ -93,7 +108,7 @@ public class CommandService
         public string[] GetSuggestions(string text, int index)
         {
             if (text.StartsWith("/"))
-                return new string[] { "/status", "/start", "/stop", "/restart" };
+                return new string[] { "/status", "/start", "/stop", "/restart", "/reloadconfig", "/quit", "/help" };
             else
                 return ["/"];
         }

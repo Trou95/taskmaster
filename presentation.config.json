@@ -1,0 +1,135 @@
+[
+  {
+    "Name": "nginx-demo",
+    "Command": "/nginx-demo",
+    "BinaryPath": "/usr/bin/sleep",
+    "NumberOfProcesses": 1,
+    "StartAtLaunch": true,
+    "RestartPolicy": "OnFailure",
+    "ExpectedExitCodes": [0, 2],
+    "ExpectedRunTime": 3,
+    "MaxRestartAttempts": 3,
+    "StopSignal": 15,
+    "KillTimeout": 5000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/nginx-demo.stdout",
+    "StdErrPath": "/tmp/nginx-demo.stderr",
+    "EnvironmentVariables": {
+      "STARTED_BY": "taskmaster",
+      "ANSWER": "42",
+      "SERVICE_NAME": "nginx-demo"
+    },
+    "WorkingDirectory": "/tmp",
+    "Umask": "022"
+  },
+  {
+    "Name": "worker-always",
+    "Command": "/worker-always",
+    "BinaryPath": "/bin/bash",
+    "NumberOfProcesses": 2,
+    "StartAtLaunch": false,
+    "RestartPolicy": "Always",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 2,
+    "MaxRestartAttempts": 5,
+    "StopSignal": 15,
+    "KillTimeout": 3000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/worker-always.stdout",
+    "StdErrPath": "/tmp/worker-always.stderr",
+    "EnvironmentVariables": {
+      "WORKER_TYPE": "always",
+      "RESTART_POLICY": "always"
+    },
+    "WorkingDirectory": "/tmp",
+    "Umask": "077"
+  },
+  {
+    "Name": "echo-service",
+    "Command": "/echo-service",
+    "BinaryPath": "/bin/echo",
+    "NumberOfProcesses": 1,
+    "StartAtLaunch": true,
+    "RestartPolicy": "Never",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 1,
+    "MaxRestartAttempts": 0,
+    "StopSignal": 15,
+    "KillTimeout": 1000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/echo-service.stdout",
+    "StdErrPath": "/tmp/echo-service.stderr",
+    "EnvironmentVariables": {
+      "MESSAGE": "Hello from Taskmaster!",
+      "SERVICE": "echo-demo"
+    },
+    "WorkingDirectory": "/tmp",
+    "Umask": "022"
+  },
+  {
+    "Name": "long-runner",
+    "Command": "/long-runner",
+    "BinaryPath": "/bin/sleep",
+    "NumberOfProcesses": 1,
+    "StartAtLaunch": false,
+    "RestartPolicy": "OnFailure",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 5,
+    "MaxRestartAttempts": 3,
+    "StopSignal": 15,
+    "KillTimeout": 10000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/long-runner.stdout",
+    "StdErrPath": "/tmp/long-runner.stderr",
+    "EnvironmentVariables": {
+      "DURATION": "30",
+      "SERVICE_TYPE": "long-running"
+    },
+    "WorkingDirectory": "/tmp",
+    "Umask": "022"
+  },
+  {
+    "Name": "failing-service",
+    "Command": "/failing-service",
+    "BinaryPath": "/bin/bash",
+    "NumberOfProcesses": 1,
+    "StartAtLaunch": false,
+    "RestartPolicy": "OnFailure",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 1,
+    "MaxRestartAttempts": 2,
+    "StopSignal": 15,
+    "KillTimeout": 2000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/failing-service.stdout",
+    "StdErrPath": "/tmp/failing-service.stderr",
+    "EnvironmentVariables": {
+      "FAIL_RATE": "high",
+      "TEST_MODE": "failure"
+    },
+    "WorkingDirectory": "/tmp",
+    "Umask": "022"
+  },
+  {
+    "Name": "multi-process",
+    "Command": "/multi-process",
+    "BinaryPath": "/bin/sleep",
+    "NumberOfProcesses": 3,
+    "StartAtLaunch": true,
+    "RestartPolicy": "Always",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 2,
+    "MaxRestartAttempts": 5,
+    "StopSignal": 15,
+    "KillTimeout": 4000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/multi-process.stdout",
+    "StdErrPath": "/tmp/multi-process.stderr",
+    "EnvironmentVariables": {
+      "INSTANCE_COUNT": "3",
+      "PROCESS_TYPE": "multi"
+    },
+    "WorkingDirectory": "/tmp",
+    "Umask": "022"
+  }
+]

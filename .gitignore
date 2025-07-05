@@ -361,3 +361,58 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ==========================================
+# Taskmaster Project Specific
+# ==========================================
+
+# Configuration files (keep examples but ignore actual config)
+task.config.json
+*.config.json
+!presentation.config.json
+!test.config.json
+
+# Log files
+*.log
+taskmaster.log
+
+# Process output files
+/tmp/*.stdout
+/tmp/*.stderr
+*.stdout
+*.stderr
+
+# Runtime files
+*.pid
+
+# Test artifacts
+test_output/
+test_logs/
+
+# Temporary files created during testing
+temp_*
+tmp_*
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Subject PDF (already tracked, but avoid future PDFs)
+*.pdf
+!en.subject.pdf
+
+# Documentation artifacts (keep reports but ignore temp docs)
+*.tmp.md
+draft_*.md

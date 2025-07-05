@@ -20,6 +20,8 @@ public static class AppExtensions
         app.commandService.Add("/stop");
         app.commandService.Add("/restart");
         app.commandService.Add("/reloadconfig");
+        app.commandService.Add("/quit");
+        app.commandService.Add("/help");
         
         return app;
     }

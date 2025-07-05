@@ -77,6 +77,36 @@ public class ContainerService
         }
     }
 
+    public void StopContainerByName(string name)
+    {
+        Container? res = _containers.Find(c => String.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (res != null)
+        {
+            Console.WriteLine($"Stopping container {name}");
+            StopContainer(res);
+        }
+        else
+        {
+            Console.WriteLine($"Error: Container {name} not found");
+        }
+    }
+
+    public void RestartContainerByName(string name)
+    {
+        Container? res = _containers.Find(c => String.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (res != null)
+        {
+            Console.WriteLine($"Restarting container {name}");
+            StopContainer(res);
+            Task.Delay(1000).Wait();
+            StartContainer(res.Command);
+        }
+        else
+        {
+            Console.WriteLine($"Error: Container {name} not found");
+        }
+    }
+
     public void StopContainer(Container container)
     {
         if (container.ContainerStatus == ContainerStatus.Waiting)
@@ -144,6 +174,66 @@ public class ContainerService
         _containers.Add(_mapper.Map<ExtendedContainer>(container));
     }
 
+    public void UpdateContainers(List<Container> newContainers)
+    {
+        var existingContainers = _containers.ToList();
+        var containersToRemove = new List<ExtendedContainer>();
+        var containersToAdd = new List<Container>();
+
+        foreach (var existing in existingContainers)
+        {
+            var found = newContainers.FirstOrDefault(nc => nc.Name == existing.Name);
+            if (found == null)
+            {
+                StopContainer(existing);
+                containersToRemove.Add(existing);
+            }
+            else if (!AreContainersEqual(existing, found))
+            {
+                StopContainer(existing);
+                containersToRemove.Add(existing);
+                containersToAdd.Add(found);
+            }
+        }
+
+        foreach (var newContainer in newContainers)
+        {
+            if (!existingContainers.Any(ec => ec.Name == newContainer.Name))
+            {
+                containersToAdd.Add(newContainer);
+            }
+        }
+
+        foreach (var container in containersToRemove)
+        {
+            _containers.Remove(container);
+        }
+
+        foreach (var container in containersToAdd)
+        {
+            Add(container);
+        }
+    }
+
+    private bool AreContainersEqual(Container existing, Container newContainer)
+    {
+        return existing.Name == newContainer.Name &&
+               existing.Command == newContainer.Command &&
+               existing.BinaryPath == newContainer.BinaryPath &&
+               existing.NumberOfProcesses == newContainer.NumberOfProcesses &&
+               existing.RestartPolicy == newContainer.RestartPolicy &&
+               existing.MaxRestartAttempts == newContainer.MaxRestartAttempts &&
+               existing.StopSignal == newContainer.StopSignal &&
+               existing.KillTimeout == newContainer.KillTimeout &&
+               existing.WorkingDirectory == newContainer.WorkingDirectory &&
+               existing.Umask == newContainer.Umask &&
+               existing.LogOutput == newContainer.LogOutput &&
+               existing.ExpectedRunTime == newContainer.ExpectedRunTime &&
+               existing.StartAtLaunch == newContainer.StartAtLaunch &&
+               existing.ExpectedExitCodes.SequenceEqual(newContainer.ExpectedExitCodes) &&
+               existing.EnvironmentVariables.SequenceEqual(newContainer.EnvironmentVariables);
+    }
+
     public Container? FindByCommand(Command command)
     {
         return _containers.Find(c => c.Command == command);
@@ -182,6 +272,12 @@ public class ContainerService
         if (container == null)
             return;
         container.ProcessStartTimes[process] = DateTime.Now;
+        
+        if(container.LogOutput)
+        {
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+        }
     }
 
     private Dictionary<Process, Task> InitProcess(ExtendedContainer container)
@@ -204,6 +300,31 @@ public class ContainerService
             {
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                
+                process.OutputDataReceived += (sender, e) => 
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        container.StdOut += e.Data + Environment.NewLine;
+                        if (!string.IsNullOrEmpty(container.StdOutPath))
+                        {
+                            File.AppendAllText(container.StdOutPath, e.Data + Environment.NewLine);
+                        }
+                    }
+                };
+                
+                process.ErrorDataReceived += (sender, e) => 
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        container.StdErr += e.Data + Environment.NewLine;
+                        if (!string.IsNullOrEmpty(container.StdErrPath))
+                        {
+                            File.AppendAllText(container.StdErrPath, e.Data + Environment.NewLine);
+                        }
+                    }
+                };
             }
 
             container.Processes.Add(process, new Task(() => ProcessHandler(process), container.CancellationTokenSource.Token));
@@ -305,13 +426,14 @@ public class ContainerService
         process.WaitForExit();
 
         var processTotalRunTime = container.ProcessStartTimes.ContainsKey(process) ? (process.ExitTime - container.ProcessStartTimes[process]).TotalSeconds : 0;
-        if(container.ExpectedRunTime != 0 && processTotalRunTime > container.ExpectedRunTime)
+        if(container.ExpectedRunTime != 0 && processTotalRunTime >= container.ExpectedRunTime)
             OnContainerSuccessfullyStart?.Invoke(container, (int)processTotalRunTime);
         
         if(container.RestartPolicy != RestartPolicy.Never)
         {
             if(container.RestartPolicy == RestartPolicy.Always)
             {
+                LogService.Log($"Container {container.Name} exited with code {process.ExitCode}, restarting (always policy)");
                 RestartContainer(process);
                 return;
             }
@@ -319,9 +441,17 @@ public class ContainerService
             {
                 if(!container.ExpectedExitCodes.Contains(process.ExitCode))
                 {
+                    LogService.Log($"Container {container.Name} died unexpectedly with exit code {process.ExitCode}, restarting");
                     RestartContainer(process);
                     return;
                 }                
+            }
+        }
+        else
+        {
+            if(!container.ExpectedExitCodes.Contains(process.ExitCode))
+            {
+                LogService.Log($"Container {container.Name} died unexpectedly with exit code {process.ExitCode}");
             }
         }
 
