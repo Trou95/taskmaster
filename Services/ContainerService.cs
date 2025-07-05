@@ -416,10 +416,8 @@ public class ContainerService
 
         if(container.LogOutput)
         {
-            StreamReader readerOut = process.StandardOutput;
-            StreamReader readerErr = process.StandardError;
-            container.StdOut += readerOut.ReadToEnd();
-            container.StdErr += readerErr.ReadToEnd();
+            // Asynchronous output reading kullandığımız için synchronous okuma yapamayız
+            // Output'lar zaten event handler'larda toplanıyor
         }
 
         container.ProcessExitTime = DateTime.Now;

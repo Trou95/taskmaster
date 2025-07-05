@@ -1,0 +1,68 @@
+[
+  {
+    "Name": "docker-echo",
+    "Command": "/docker-echo",
+    "BinaryPath": "/bin/echo",
+    "NumberOfProcesses": 1,
+    "StartAtLaunch": true,
+    "RestartPolicy": "Never",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 1,
+    "MaxRestartAttempts": 0,
+    "StopSignal": 15,
+    "KillTimeout": 2000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/taskmaster/docker-echo.stdout",
+    "StdErrPath": "/tmp/taskmaster/docker-echo.stderr",
+    "EnvironmentVariables": {
+      "MESSAGE": "Hello from Docker Taskmaster!",
+      "CONTAINER_ENV": "docker"
+    },
+    "WorkingDirectory": "/tmp/taskmaster",
+    "Umask": "022"
+  },
+  {
+    "Name": "docker-sleep",
+    "Command": "/docker-sleep",
+    "BinaryPath": "/bin/sleep",
+    "NumberOfProcesses": 1,
+    "StartAtLaunch": true,
+    "RestartPolicy": "Always",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 2,
+    "MaxRestartAttempts": 5,
+    "StopSignal": 15,
+    "KillTimeout": 5000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/taskmaster/docker-sleep.stdout",
+    "StdErrPath": "/tmp/taskmaster/docker-sleep.stderr",
+    "EnvironmentVariables": {
+      "SLEEP_DURATION": "10",
+      "SERVICE_TYPE": "background"
+    },
+    "WorkingDirectory": "/tmp/taskmaster",
+    "Umask": "022"
+  },
+  {
+    "Name": "docker-date",
+    "Command": "/docker-date",
+    "BinaryPath": "/bin/date",
+    "NumberOfProcesses": 2,
+    "StartAtLaunch": false,
+    "RestartPolicy": "OnFailure",
+    "ExpectedExitCodes": [0],
+    "ExpectedRunTime": 1,
+    "MaxRestartAttempts": 3,
+    "StopSignal": 15,
+    "KillTimeout": 3000,
+    "LogOutput": true,
+    "StdOutPath": "/tmp/taskmaster/docker-date.stdout",
+    "StdErrPath": "/tmp/taskmaster/docker-date.stderr",
+    "EnvironmentVariables": {
+      "TZ": "UTC",
+      "DATE_FORMAT": "ISO"
+    },
+    "WorkingDirectory": "/tmp/taskmaster",
+    "Umask": "022"
+  }
+]

@@ -38,7 +38,7 @@ public class App : IApp
 
         commandService.OnDefaultCommand += OnDefaultCommand;
 
-        SignalHandler();
+        //SignalHandler();
         SocketHandler();
 
         if(Environment.GetCommandLineArgs().Length > 1)

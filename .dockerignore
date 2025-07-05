@@ -1,0 +1,58 @@
+# .dockerignore for Taskmaster
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Build outputs
+bin/
+obj/
+out/
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Logs and runtime files
+*.log
+taskmaster.log
+*.stdout
+*.stderr
+*.pid
+
+# Test files
+test_output/
+test_logs/
+temp_*
+tmp_*
+
+# Documentation (keep only essential)
+*.md
+!README.md
+
+# Subject files
+*.pdf
+
+# Temporary config files
+task.config.json
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Coverage reports
+coverage*.json
+coverage*.xml
+coverage*.info
