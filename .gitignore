@@ -367,8 +367,6 @@ FodyWeavers.xsd
 # ==========================================
 
 # Configuration files (keep examples but ignore actual config)
-task.config.json
-*.config.json
 !presentation.config.json
 !test.config.json
 
