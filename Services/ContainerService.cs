@@ -41,6 +41,7 @@ public class ContainerService
                     throw new ContainerServiceException($"Error: {res.Name} is already running");
 
                 ExtendedContainer container = (ExtendedContainer)res;
+                Console.WriteLine(container.Name + " is starting...");
                 container.Processes = InitProcess(container);
                 
                 OnContainerStarting?.Invoke(container);
@@ -107,22 +108,24 @@ public class ContainerService
         }
     }
 
+
     public void StopContainer(Container container)
     {
         if (container.ContainerStatus == ContainerStatus.Waiting)
             return;
- 
+
         var c = (ExtendedContainer)container;
 
         try
         {
-            if(c.LogOutput)
+            if (c.LogOutput)
             {
+                Console.WriteLine($"Stopping container {c.Name} and writing logs to {c.StdOutPath} and {c.StdErrPath}");
                 File.WriteAllText(c.StdOutPath, c.StdOut);
                 File.WriteAllText(c.StdErrPath, c.StdErr);
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e.Message);
         }
@@ -298,6 +301,7 @@ public class ContainerService
 
             if(container.LogOutput)
             {
+                Console.WriteLine($"Logging output for container {container.Name}");
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.UseShellExecute = false;

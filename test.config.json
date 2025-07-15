@@ -1,65 +1,23 @@
 [
   {
-    "Name": "TestAutostart",
-    "Command": "/test-autostart",
-    "BinaryPath": "/bin/echo",
+    "Name": "test",
+    "Command": "/test",
+    "BinaryPath": "./tests/main",
     "NumberOfProcesses": 1,
     "StartAtLaunch": true,
-    "RestartPolicy": "Never",
-    "ExpectedExitCodes": [0],
-    "ExpectedRunTime": 1,
+    "RestartPolicy": "OnFailure",
+    "ExpectedExitCodes": [0, 2],
+    "ExpectedRunTime": 3,
     "MaxRestartAttempts": 3,
     "StopSignal": 15,
     "KillTimeout": 5000,
     "LogOutput": true,
-    "StdOutPath": "/tmp/test-autostart.stdout",
-    "StdErrPath": "/tmp/test-autostart.stderr",
+    "StdOutPath": "./tests/test.log",
+    "StdErrPath": "./tests/error.log",
     "EnvironmentVariables": {
-      "TEST_VAR": "autostart_test"
-    },
-    "WorkingDirectory": "/tmp",
-    "Umask": "022"
-  },
-  {
-    "Name": "TestManual",
-    "Command": "/test-manual",
-    "BinaryPath": "/bin/sleep",
-    "NumberOfProcesses": 1,
-    "StartAtLaunch": false,
-    "RestartPolicy": "Always",
-    "ExpectedExitCodes": [0],
-    "ExpectedRunTime": 2,
-    "MaxRestartAttempts": 5,
-    "StopSignal": 15,
-    "KillTimeout": 3000,
-    "LogOutput": true,
-    "StdOutPath": "/tmp/test-manual.stdout",
-    "StdErrPath": "/tmp/test-manual.stderr",
-    "EnvironmentVariables": {
-      "TEST_VAR": "manual_test"
-    },
-    "WorkingDirectory": "/tmp",
-    "Umask": "022"
-  },
-  {
-    "Name": "TestRestart",
-    "Command": "/test-restart",
-    "BinaryPath": "/bin/bash",
-    "NumberOfProcesses": 1,
-    "StartAtLaunch": false,
-    "RestartPolicy": "OnFailure",
-    "ExpectedExitCodes": [0],
-    "ExpectedRunTime": 1,
-    "MaxRestartAttempts": 3,
-    "StopSignal": 15,
-    "KillTimeout": 2000,
-    "LogOutput": true,
-    "StdOutPath": "/tmp/test-restart.stdout",
-    "StdErrPath": "/tmp/test-restart.stderr",
-    "EnvironmentVariables": {
-      "TEST_VAR": "restart_test"
-    },
-    "WorkingDirectory": "/tmp",
-    "Umask": "022"
+      "STARTED_BY": "taskmaster",
+      "ANSWER": "42",
+      "SERVICE_NAME": "nginx-demo"
+    }
   }
 ]

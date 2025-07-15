@@ -369,16 +369,37 @@ FodyWeavers.xsd
 # Configuration files (keep examples but ignore actual config)
 !presentation.config.json
 !test.config.json
+!task.config.json
+!docker-config.json
+!tests/comprehensive_test.config.json
 
-# Log files
+# Log files and output
 *.log
 taskmaster.log
+tests/logs/
+tests/*.log
 
 # Process output files
 /tmp/*.stdout
 /tmp/*.stderr
 *.stdout
 *.stderr
+
+# Compiled test executables
+tests/simple_output
+tests/heavy_output
+tests/failing_process
+tests/signal_handler
+tests/env_test
+tests/quick_exit
+tests/long_startup
+tests/main
+tests/a.out
+
+# C/C++ compiled files
+*.o
+*.out
+*.exe
 
 # Runtime files
 *.pid

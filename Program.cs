@@ -6,6 +6,8 @@ using Taskmaster.Logger;
 
 static void ApplicationStart()
 {
+    LogService.Add(new FileLogger("taskmaster.log"));
+    
     App? app = null;
     try
     {
@@ -19,8 +21,11 @@ static void ApplicationStart()
                 app.commandService.Add(new (c.Command, false));
                 app.containerService.Add(c);
                 
-                if(c.StartAtLaunch)
+            
+                
+                if (c.StartAtLaunch)
                 {
+                    Console.WriteLine($"Path: {c.StdOutPath}");
                     app.containerService.StartContainer(c.Command);
                 }
             }

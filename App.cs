@@ -27,7 +27,7 @@ public class App : IApp
     public delegate void OnSignalRecieved(IApp sender, Signum signal);
     public event OnSignalRecieved? OnSignalRecievedEvent;
 
-    public App(string configPath = "task.config.json")
+    public App(string configPath = "test.config.json")
     {
         config = new Config(configPath);
         
