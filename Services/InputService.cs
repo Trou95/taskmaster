@@ -12,7 +12,15 @@ public class InputService
 
     public string? GetInput(string prefix)
     {
-        _input = ReadLine.Read("> ");
+        try
+        {
+            _input = ReadLine.Read("> ");
+        }
+        catch (InvalidOperationException)
+        {
+            Console.Write("> ");
+            _input = Console.ReadLine();
+        }
 
         if (Command.IsValidCommand(_input!))
             OnCommandTyped?.Invoke(app, _input!);
