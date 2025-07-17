@@ -9,6 +9,7 @@ int main() {
     
     while(true) {
         std::cout << "[" << count++ << "] " << message << std::endl;
+        std::cerr << "Error: This is a simulated error message." << std::endl;
         std::cout.flush();
         sleep(2);
     }
