@@ -275,6 +275,7 @@ public class ContainerService
         if (container == null)
             return;
         container.ProcessStartTimes[process] = DateTime.Now;
+        container.ContainerStatus = ContainerStatus.Running;
         
         if(container.LogOutput)
         {

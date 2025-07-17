@@ -5,7 +5,7 @@
     "BinaryPath": "./tests/main",
     "NumberOfProcesses": 1,
     "StartAtLaunch": true,
-    "RestartPolicy": "OnFailure",
+    "RestartPolicy": "Always",
     "ExpectedExitCodes": [0, 2],
     "ExpectedRunTime": 3,
     "MaxRestartAttempts": 3,
@@ -13,12 +13,7 @@
     "KillTimeout": 5000,
     "LogOutput": true,
     "StdOutPath": "./tests/test.log",
-    "StdErrPath": "./tests/error.log",
-    "EnvironmentVariables": {
-      "STARTED_BY": "taskmaster",
-      "ANSWER": "42",
-      "SERVICE_NAME": "nginx-demo"
-    }
+    "StdErrPath": "./tests/error.log"
   },
   {
     "Name": "simple-output",
@@ -26,7 +21,7 @@
     "BinaryPath": "./tests/simple_output",
     "NumberOfProcesses": 1,
     "StartAtLaunch": true,
-    "RestartPolicy": "OnFailure",
+    "RestartPolicy": "Always",
     "ExpectedExitCodes": [0],
     "ExpectedRunTime": 3,
     "MaxRestartAttempts": 3,

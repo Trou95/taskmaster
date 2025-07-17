@@ -58,9 +58,9 @@ public class RestartPolicyConverter : JsonConverter<RestartPolicy>
         string? value = reader.GetString();
         return value switch
         {
-            "always" => RestartPolicy.Always,
-            "never" => RestartPolicy.Never,
-            "fail" => RestartPolicy.OnFailure,
+            "always" or "Always" => RestartPolicy.Always,
+            "never" or "Never" => RestartPolicy.Never,
+            "fail" or "OnFailure" => RestartPolicy.OnFailure,
             _ => RestartPolicy.Never
         };
     }

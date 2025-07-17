@@ -45,7 +45,6 @@ static void ApplicationStart()
         System.Environment.Exit(1);
     }
 
-    LogService.Add(new FileLogger("taskmaster.log"));
     //LogService.Add(new DatabaseLogger());
     while (true)
     {
